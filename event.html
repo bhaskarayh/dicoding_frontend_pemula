@@ -23,7 +23,7 @@
 
 <body>
     <div class="contents" align="center" hidden>
-        <button id="incrementButton" onclick="incrementClick()">Tekan Aku :)</button>
+        <button id="incrementButton">Tekan Aku :)</button>
         <h3>Kamu sudah menekan tombol di atas sebanyak <span id="count">0</span></h3>
     </div>
 
@@ -35,16 +35,15 @@
             contents.removeAttribute('hidden');
         }
 
-        document.body.onload = welcome;
+        // document.body.onload = welcome;
+        window.addEventListener('load', welcome);
 
         const incrementButton = document.getElementById('incrementButton');
         const countSpan = document.getElementById("count");
 
-        // incrementButton.addEventListener('click', () => {
-        //     // console.log(countSpan.innerText);
-        //     // countSpan.innerText++;
-        //     incrementClick();
-        // })
+        incrementButton.addEventListener('click',
+            incrementClick
+        );
         // console.log(incrementButton);
 
         function incrementClick() {
