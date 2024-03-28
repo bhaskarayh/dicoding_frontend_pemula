@@ -7,9 +7,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const todos = []
     const RENDER_EVENT = 'render-todo'
+    const SAVED_EVENT = 'saved-todo'
+
+    const STORAGE_KEY = 'TODO_APPS'
 
     document.addEventListener(RENDER_EVENT, function () {
         console.log(todos)
+
         const uncompletedTODOList = document.getElementById('todos')
         uncompletedTODOList.innerHTML = ''
 
@@ -40,6 +44,8 @@ document.addEventListener('DOMContentLoaded', function () {
         todos.push(todoObject)
 
         document.dispatchEvent(new Event(RENDER_EVENT))
+
+        saveTodo()
 
         function generateId() {
             return +new Date()
@@ -106,6 +112,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             todoTarget.isCompleted = true
             document.dispatchEvent(new Event(RENDER_EVENT))
+
+            saveTodo()
         }
 
         function undoTaskFromCompleted(todoId) {
@@ -115,6 +123,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             todoTarget.isCompleted = false
             document.dispatchEvent(new Event(RENDER_EVENT))
+
+            saveTodo()
         }
 
         function removeTaskFromCompleted(todoId) {
@@ -125,6 +135,8 @@ document.addEventListener('DOMContentLoaded', function () {
             todos.splice(todoTarget, 1)
 
             document.dispatchEvent(new Event(RENDER_EVENT))
+
+            saveTodo()
         }
 
         function findTodo(todoId) {
@@ -136,5 +148,55 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         return container
+    }
+
+    function saveTodo() {
+        if (isStorageExist) {
+            const parsed = JSON.stringify(todos)
+            localStorage.setItem(STORAGE_KEY, parsed)
+            document.dispatchEvent(new Event(SAVED_EVENT))
+        }
+    }
+
+    document.addEventListener(SAVED_EVENT, function () {
+        console.log({ local: localStorage.getItem(STORAGE_KEY) })
+    })
+
+    function loadDataFromStorage() {
+        const serializedData = localStorage.getItem(STORAGE_KEY)
+        let data = JSON.parse(serializedData)
+
+        if (data !== null) {
+            for (const todo of data) {
+                todos.push(todo)
+            }
+        }
+
+        document.dispatchEvent(new Event(RENDER_EVENT))
+    }
+
+    // document.addEventListener('load', function () {
+    //     document.dispatchEvent(new Event(RENDER_EVENT))
+    // })
+
+    document.addEventListener(SAVED_EVENT, function () {
+        console.log({ local: localStorage.getItem(STORAGE_KEY) })
+
+        const snackbar = document.getElementById('snackbar')
+        snackbar.className = 'show'
+        snackbar.innerText = 'Berhasil Save Item'
+
+        setTimeout(function () {
+            snackbar.className = snackbar.className.replace('show', '')
+        }, 3000)
+    })
+
+    function isStorageExist() {
+        return typeof Storage !== 'undefined'
+    }
+
+    if (isStorageExist()) {
+        console.log('ree')
+        loadDataFromStorage()
     }
 })
