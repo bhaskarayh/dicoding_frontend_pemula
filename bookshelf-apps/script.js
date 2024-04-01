@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (booksFilter.length === 0) {
             for (let bookItem of books) {
-                if (!bookItem.isCompleted) {
+                if (!bookItem.isComplete) {
                     uncompletedBooksList.append(makeBooksList(bookItem));
                 } else {
                     completedBooksList.append(makeBooksList(bookItem));
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         } else {
             for (let bookItem of booksFilter) {
-                if (!bookItem.isCompleted) {
+                if (!bookItem.isComplete) {
                     uncompletedBooksList.append(makeBooksList(bookItem));
                 } else {
                     completedBooksList.append(makeBooksList(bookItem));
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function () {
             generatedId,
             inputBookTitle.value,
             inputBookAuthor.value,
-            inputBookYear.value,
+            Number(inputBookYear.value),
             inputBookIsComplete.checked
         );
 
@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        if (bookObject.isCompleted) {
+        if (bookObject.isComplete) {
             const uncompletedButton = document.createElement('button');
             uncompletedButton.classList.add('green');
             uncompletedButton.innerText = 'Belum selesai di Baca';
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 inputModalBookTitle.value = bookObject.title;
                 inputModalBookAuthor.value = bookObject.author;
                 inputModalBookYear.value = bookObject.year;
-                inputModalBookIsComplete.checked = bookObject.isCompleted;
+                inputModalBookIsComplete.checked = bookObject.isComplete;
 
                 const buttonClose = document.getElementById('button-close');
                 buttonClose.addEventListener('click', function () {
@@ -229,13 +229,13 @@ document.addEventListener('DOMContentLoaded', function () {
         return +new Date();
     }
 
-    function generateBookObject(id, title, author, year, isCompleted = false) {
+    function generateBookObject(id, title, author, year, isComplete = false) {
         return {
             id,
             title,
             author,
             year,
-            isCompleted,
+            isComplete,
         };
     }
 
@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (bookTarget === null) return;
 
-        bookTarget.isCompleted = true;
+        bookTarget.isComplete = true;
         document.dispatchEvent(new Event(RENDER_EVENT));
 
         // Save to local storage
@@ -256,7 +256,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (bookTarget === null) return;
 
-        bookTarget.isCompleted = false;
+        bookTarget.isComplete = false;
         document.dispatchEvent(new Event(RENDER_EVENT));
 
         // Save to local storage
@@ -268,18 +268,18 @@ document.addEventListener('DOMContentLoaded', function () {
         bookTitle,
         bookAuthor,
         bookYear,
-        bookCompleted = false
+        bookComplete = false
     ) {
         const bookTarget = findBook(bookId);
 
         // console.log('sex');
-        // console.log(bookId, bookTitle, bookAuthor, bookYear, bookCompleted);
+        // console.log(bookId, bookTitle, bookAuthor, bookYear, bookComplete);
         if (bookTarget === null) return;
 
         bookTarget.title = bookTitle;
         bookTarget.author = bookAuthor;
-        bookTarget.year = bookYear;
-        bookTarget.isCompleted = bookCompleted;
+        bookTarget.year = Number(bookYear);
+        bookTarget.isComplete = bookComplete;
 
         // Save to local storage
         saveToLocalStorage();
@@ -294,10 +294,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         books.splice(bookTarget, 1);
 
-        document.dispatchEvent(new Event(RENDER_EVENT));
-
         // Save to local storage
         saveToLocalStorage();
+
+        document.dispatchEvent(new Event(RENDER_EVENT));
     }
 
     function findBook(bookId) {
@@ -314,7 +314,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 (book) =>
                     book.title.toLowerCase().includes(query.toLowerCase()) ||
                     book.author.toLowerCase().includes(query.toLowerCase()) ||
-                    book.year.includes(query)
+                    book.year === Number(query)
             ) || null
         );
     }
