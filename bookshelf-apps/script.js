@@ -48,27 +48,32 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Main Function
     function addBook() {
-        const inputBookTitle = document.getElementById('inputBookTitle').value;
-        const inputBookAuthor =
-            document.getElementById('inputBookAuthor').value;
-        const inputBookYear = document.getElementById('inputBookYear').value;
+        const inputBookTitle = document.getElementById('inputBookTitle');
+        const inputBookAuthor = document.getElementById('inputBookAuthor');
+        const inputBookYear = document.getElementById('inputBookYear');
         const inputBookIsComplete = document.getElementById(
             'inputBookIsComplete'
-        ).checked;
+        );
 
         const generatedId = generateId();
         const bookObject = generateBookObject(
             generatedId,
-            inputBookTitle,
-            inputBookAuthor,
-            inputBookYear,
-            inputBookIsComplete
+            inputBookTitle.value,
+            inputBookAuthor.value,
+            inputBookYear.value,
+            inputBookIsComplete.checked
         );
 
         books.push(bookObject);
 
         // Save to local storage
         saveToLocalStorage();
+
+        // Clear Input After Save
+        inputBookTitle.value = '';
+        inputBookAuthor.value = '';
+        inputBookYear.value = '';
+        inputBookIsComplete.checked = false;
 
         document.dispatchEvent(new Event(RENDER_EVENT));
     }
@@ -96,7 +101,10 @@ document.addEventListener('DOMContentLoaded', function () {
         deletedButton.innerText = 'Hapus Buku';
 
         deletedButton.addEventListener('click', function () {
-            deleteBook(bookObject.id);
+            if (confirm('Apakah anda yakin ingin menghapusnya?')) {
+                deleteBook(bookObject.id);
+                alert('Data berhasil dihapus!');
+            }
         });
 
         if (bookObject.isCompleted) {
@@ -118,12 +126,71 @@ document.addEventListener('DOMContentLoaded', function () {
             completedButton.classList.add('green');
             completedButton.innerText = 'Selesai dibaca';
 
+            const editButton = document.createElement('button');
+            editButton.classList.add('cornflowerblue');
+            editButton.innerText = 'Edit Buku';
+
             const buttonContainer = document.createElement('div');
             buttonContainer.classList.add('action');
-            buttonContainer.append(completedButton, deletedButton);
+            buttonContainer.append(completedButton, deletedButton, editButton);
 
             completedButton.addEventListener('click', function () {
                 addBookToCompleted(bookObject.id);
+            });
+
+            editButton.addEventListener('click', function () {
+                // Show Modal
+                const modalInput = document.getElementById('modal-section');
+                modalInput.classList.add('show');
+
+                // Modal Input
+                const inputModalBookTitle = document.getElementById(
+                    'inputModalBookTitle'
+                );
+                const inputModalBookAuthor = document.getElementById(
+                    'inputModalBookAuthor'
+                );
+                const inputModalBookYear =
+                    document.getElementById('inputModalBookYear');
+                const inputModalBookIsComplete = document.getElementById(
+                    'inputModalBookIsComplete'
+                );
+
+                // Set Initial Value
+                inputModalBookTitle.value = bookObject.title;
+                inputModalBookAuthor.value = bookObject.author;
+                inputModalBookYear.value = bookObject.year;
+                inputModalBookIsComplete.checked = bookObject.isCompleted;
+
+                const buttonClose = document.getElementById('button-close');
+                buttonClose.addEventListener('click', function () {
+                    modalInput.classList.remove('show');
+                });
+
+                const inputModalBook =
+                    document.getElementById('inputModalBook');
+
+                inputModalBook.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    // console.log('sssss');
+                    editBook(
+                        bookObject.id,
+                        inputModalBookTitle.value,
+                        inputModalBookAuthor.value,
+                        inputModalBookYear.value,
+                        inputModalBookIsComplete.checked
+                    );
+
+                    modalInput.classList.remove('show');
+                });
+
+                // console.log(
+                //     inputModalBookTitle.value,
+                //     inputModalBookAuthor.value,
+                //     inputModalBookYear.value,
+                //     inputModalBookIsComplete.checked
+                // );
+                // addBookToCompleted(bookObject.id);
             });
 
             articleElement.append(buttonContainer);
@@ -196,6 +263,30 @@ document.addEventListener('DOMContentLoaded', function () {
         saveToLocalStorage();
     }
 
+    function editBook(
+        bookId,
+        bookTitle,
+        bookAuthor,
+        bookYear,
+        bookCompleted = false
+    ) {
+        const bookTarget = findBook(bookId);
+
+        // console.log('sex');
+        // console.log(bookId, bookTitle, bookAuthor, bookYear, bookCompleted);
+        if (bookTarget === null) return;
+
+        bookTarget.title = bookTitle;
+        bookTarget.author = bookAuthor;
+        bookTarget.year = bookYear;
+        bookTarget.isCompleted = bookCompleted;
+
+        // Save to local storage
+        saveToLocalStorage();
+
+        document.dispatchEvent(new Event(RENDER_EVENT));
+    }
+
     function deleteBook(bookId) {
         const bookTarget = findIndexBook(bookId);
 
@@ -262,5 +353,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.addEventListener(SAVED_EVENT, function () {
         console.log({ localStorage: localStorage.getItem(STORAGE_KEY) });
+
+        const snackbar = document.getElementById('snackbar');
+        snackbar.className = 'show';
+        snackbar.innerText = 'Berhasil Save Item';
+
+        setTimeout(function () {
+            snackbar.className = snackbar.className.replace('show', '');
+        }, 3000);
     });
 });

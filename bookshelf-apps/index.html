@@ -84,6 +84,32 @@
         <!--      </article>-->
       </div>
     </section>
+
+    <section class="modal_section" id="modal-section">
+      <button type="button" class="button-close" id="button-close">x</button>
+      <h2>Edit Buku</h2>
+      <form id="inputModalBook">
+        <div class="input">
+          <label for="inputModalBookTitle">Judul</label>
+          <input id="inputModalBookTitle" type="text" required>
+        </div>
+        <div class="input">
+          <label for="inputModalBookAuthor">Penulis</label>
+          <input id="inputModalBookAuthor" type="text" required>
+        </div>
+        <div class="input">
+          <label for="inputModalBookYear">Tahun</label>
+          <input id="inputModalBookYear" type="number" required>
+        </div>
+        <div class="input_inline">
+          <label for="inputModalBookIsComplete">Selesai dibaca</label>
+          <input id="inputModalBookIsComplete" type="checkbox">
+        </div>
+        <button id="bookModalSubmit" type="submit">Simpan Perubahan Buku</button>
+      </form>
+    </section>
+
+    <div id="snackbar">Lorem ipsum dolor sit amet</div>
   </main>
 
   <script src="./script.js"></script>
